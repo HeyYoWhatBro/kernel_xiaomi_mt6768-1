@@ -44,7 +44,7 @@
 #define HUB_QUIRK_CHECK_PORT_AUTOSUSPEND	0x01
 #define HUB_QUIRK_DISABLE_AUTOSUSPEND		0x02
 
-int deny_new_usb __read_mostly = 0;
+extern int deny_new_usb;
 
 /* Protect struct usb_device->state and ->children members
  * Note: Both are also protected by ->dev.sem, except that ->state can
@@ -136,6 +136,8 @@ struct usb_hub *usb_hub_to_struct_hub(struct usb_device *hdev)
 		return NULL;
 	return usb_get_intfdata(hdev->actconfig->interface[0]);
 }
+
+
 
 int usb_device_supports_lpm(struct usb_device *udev)
 {
