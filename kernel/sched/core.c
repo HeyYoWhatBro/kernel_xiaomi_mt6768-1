@@ -6233,12 +6233,12 @@ static inline bool is_sched_lib_based_app(pid_t pid)
 	get_task_struct(p);
 	rcu_read_unlock();
 
-	mm = get_task_mm(p);
-	if (!mm)
+	if (!p->mm)
 		goto put_task_struct;
 
-	down_read(&mm->mmap_sem);
-	for (vma = mm->mmap; vma ; vma = vma->vm_next) {
+	down_read(&p->mm->mmap_sem);
+	for (vma = p->mm->mmap; vma ; vma = vma->vm_next) {
+
 		if (vma->vm_file && vma->vm_flags & VM_EXEC) {
 			name = d_path(&vma->vm_file->f_path,
 					path_buf, LIB_PATH_LENGTH);
@@ -6254,8 +6254,8 @@ static inline bool is_sched_lib_based_app(pid_t pid)
 	}
 
 release_sem:
-	up_read(&mm->mmap_sem);
-	mmput(mm);
+	up_read(&p->mm->mmap_sem);
+
 put_task_struct:
 	put_task_struct(p);
 	return found;
@@ -6304,7 +6304,7 @@ SYSCALL_DEFINE3(sched_setaffinity, pid_t, pid, unsigned int, len,
 
 	retval = get_user_cpu_mask(user_mask_ptr, len, new_mask);
 	if (retval == 0)
-		retval = sched_setaffinity(pid, new_mask);
+		retval = msm_sched_setaffinity(pid, new_mask);
 	free_cpumask_var(new_mask);
 	return retval;
 }
