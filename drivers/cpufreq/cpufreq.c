@@ -31,8 +31,12 @@
 #include <linux/syscore_ops.h>
 #include <linux/tick.h>
 #include <trace/events/power.h>
+#include <linux/moduleparam.h>
 
 static LIST_HEAD(cpufreq_policy_list);
+
+static int userspace_boost_enable = 0;
+module_param(userspace_boost_enable, int, 0644);
 
 static inline bool policy_is_inactive(struct cpufreq_policy *policy)
 {
