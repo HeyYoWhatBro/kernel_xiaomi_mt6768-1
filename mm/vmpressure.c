@@ -219,6 +219,135 @@ static void vmpressure_work_fn(struct work_struct *work)
 	} while ((vmpr = vmpressure_parent(vmpr)));
 }
 
+#ifdef CONFIG_MEMCG
+static void vmpressure_memcg(gfp_t gfp, struct mem_cgroup *memcg, bool tree,
+		unsigned long scanned, unsigned long reclaimed)
+{
+	struct vmpressure *vmpr = memcg_to_vmpressure(memcg);
+
+	/*
+	 * If we got here with no pages scanned, then that is an indicator
+	 * that reclaimer was unable to find any shrinkable LRUs at the
+	 * current scanning depth. But it does not mean that we should
+	 * report the critical pressure, yet. If the scanning priority
+	 * (scanning depth) goes too high (deep), we will be notified
+	 * through vmpressure_prio(). But so far, keep calm.
+	 */
+	if (!scanned)
+		return;
+
+	if (tree) {
+		spin_lock(&vmpr->sr_lock);
+		scanned = vmpr->tree_scanned += scanned;
+		vmpr->tree_reclaimed += reclaimed;
+		spin_unlock(&vmpr->sr_lock);
+
+		if (scanned < vmpressure_win)
+			return;
+		schedule_work(&vmpr->work);
+	} else {
+		enum vmpressure_levels level;
+		unsigned long pressure;
+
+		/* For now, no users for root-level efficiency */
+		if (!memcg || memcg == root_mem_cgroup)
+			return;
+
+		spin_lock(&vmpr->sr_lock);
+		scanned = vmpr->scanned += scanned;
+		reclaimed = vmpr->reclaimed += reclaimed;
+		if (scanned < vmpressure_win) {
+			spin_unlock(&vmpr->sr_lock);
+			return;
+		}
+		vmpr->scanned = vmpr->reclaimed = 0;
+		spin_unlock(&vmpr->sr_lock);
+
+		pressure = vmpressure_calc_pressure(scanned, reclaimed);
+		level = vmpressure_level(pressure);
+
+		if (level > VMPRESSURE_LOW) {
+			/*
+			 * Let the socket buffer allocator know that
+			 * we are having trouble reclaiming LRU pages.
+			 *
+			 * For hysteresis keep the pressure state
+			 * asserted for a second in which subsequent
+			 * pressure events can occur.
+			 */
+			memcg->socket_pressure = jiffies + HZ;
+		}
+	}
+}
+#else
+static void vmpressure_memcg(gfp_t gfp, struct mem_cgroup *memcg, bool tree,
+		unsigned long scanned, unsigned long reclaimed)
+{
+}
+#endif
+
+static void calculate_vmpressure_win(void)
+{
+	long x;
+
+	x = global_node_page_state(NR_FILE_PAGES) -
+			global_node_page_state(NR_SHMEM) -
+			total_swapcache_pages() +
+			global_zone_page_state(NR_FREE_PAGES);
+	if (x < 1)
+		x = 1;
+	/*
+	 * For low (free + cached), vmpressure window should be
+	 * small, and high for higher values of (free + cached).
+	 * But it should not be linear as well. This ensures
+	 * timely vmpressure notifications when system is under
+	 * memory pressure, and optimal number of events when
+	 * cached is high. The sqaure root function is empirically
+	 * found to serve the purpose.
+	 */
+	x = int_sqrt(x);
+	vmpressure_win = x;
+}
+
+static void vmpressure_global(gfp_t gfp, unsigned long scanned,
+		unsigned long reclaimed)
+{
+	struct vmpressure *vmpr = &global_vmpressure;
+	unsigned long pressure;
+	unsigned long stall;
+
+	if (!scanned)
+		return;
+
+	spin_lock(&vmpr->sr_lock);
+	if (!vmpr->scanned)
+		calculate_vmpressure_win();
+
+	vmpr->scanned += scanned;
+	vmpr->reclaimed += reclaimed;
+
+	if (!current_is_kswapd())
+		vmpr->stall += scanned;
+
+	stall = vmpr->stall;
+	scanned = vmpr->scanned;
+	reclaimed = vmpr->reclaimed;
+	spin_unlock(&vmpr->sr_lock);
+
+	if (scanned < vmpressure_win)
+		return;
+
+	spin_lock(&vmpr->sr_lock);
+	vmpr->scanned = 0;
+	vmpr->reclaimed = 0;
+	vmpr->stall = 0;
+	spin_unlock(&vmpr->sr_lock);
+
+	pressure = vmpressure_calc_pressure(scanned, reclaimed);
+	pressure = vmpressure_account_stall(pressure, stall, scanned);
+	vmpressure_notify(pressure);
+}
+
 /**
  * vmpressure() - Account memory pressure through scanned/reclaimed ratio
  * @gfp:	reclaimer's gfp mask
