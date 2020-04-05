@@ -369,8 +369,9 @@ static void __vmpressure(gfp_t gfp, struct mem_cgroup *memcg, bool critical,
  * This function does not return any value.
  */
 void vmpressure(gfp_t gfp, struct mem_cgroup *memcg, bool tree,
-		unsigned long scanned, unsigned long reclaimed)
+		unsigned long scanned, unsigned long reclaimed, int order)
 {
+
 	struct vmpressure *vmpr = memcg_to_vmpressure(memcg);
 
 	/*
@@ -424,6 +425,10 @@ void vmpressure(gfp_t gfp, struct mem_cgroup *memcg, bool tree,
 			memcg->socket_pressure = jiffies + HZ;
 		}
 	}
+
+	if (order > PAGE_ALLOC_COSTLY_ORDER)
+		return;
+
 	__vmpressure(gfp, memcg, false, tree, scanned, reclaimed);
 
 }
