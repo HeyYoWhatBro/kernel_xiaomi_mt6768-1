@@ -33,6 +33,29 @@
 static const unsigned int vmpressure_level_med = 60;
 static const unsigned int vmpressure_level_critical = 95;
 
+static unsigned long vmpressure_scale_max = 100;
+
+/* vmpressure values >= this will be scaled based on allocstalls */
+static unsigned long allocstall_threshold = 70;
+
+static struct vmpressure global_vmpressure;
+static BLOCKING_NOTIFIER_HEAD(vmpressure_notifier);
+
+int vmpressure_notifier_register(struct notifier_block *nb)
+{
+	return blocking_notifier_chain_register(&vmpressure_notifier, nb);
+}
+
+int vmpressure_notifier_unregister(struct notifier_block *nb)
+{
+	return blocking_notifier_chain_unregister(&vmpressure_notifier, nb);
+}
+
+static void vmpressure_notify(unsigned long pressure)
+{
+	blocking_notifier_call_chain(&vmpressure_notifier, pressure, NULL);
+}
+
 /*
  * When there are too little pages left to scan, vmpressure() may miss the
  * critical pressure as number of pages will be less than "window size".
