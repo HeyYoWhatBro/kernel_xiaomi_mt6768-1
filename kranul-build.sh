@@ -90,17 +90,29 @@ function getclang() {
       echo "[!] Clang is set to zyc, cloning it..."
       mkdir -p ${MainClangPath}-zyc
       cd clang-zyc
-      wget -q $(curl https://raw.githubusercontent.com/ZyCromerZ/Clang/main/Clang-main-link.txt 2>/dev/null) -O "zyc-clang.tar.gz"
+      wget -q $(curl https://raw.githubusercontent.com/ZyCromerZ/Clang/main/Clang-16-link.txt 2>/dev/null) -O "zyc-clang.tar.gz"
       tar -xf zyc-clang.tar.gz
       ClangPath="${MainClangPath}"-zyc
       export PATH="${ClangPath}/bin:${PATH}"
       rm -f zyc-clang.tar.gz
+            wget "https://gist.github.com/dakkshesh07/240736992abf0ea6f0ee1d8acb57a400/raw/a835c3cf8d99925ca33cec3b210ee962904c9478/patch-for-old-glibc.sh" -O patch.sh && chmod +x patch.sh && ./patch.sh
       cd ..
     else
       echo "[!] Clang already exists. Skipping..."
       ClangPath="${MainClangPath}"-zyc
       export PATH="${ClangPath}/bin:${PATH}"
     fi
+    elif [ "${ClangName}" = "gk" ]; then
+      if [ ! -f "${MainClangPath}-gengkapak/bin/clang" ]; then
+      echo "[!] Clang is set to gengkapak, cloning it..."
+      git clone https://github.com/GK-Devs/GengKapak-clang clang-gengkapak
+      ClangPath="${MainClangPath}"-gengkapak
+      export PATH="${ClangPath}/bin:${PATH}"
+      else
+      echo "[!] Clang already exists. Skipping..."
+      ClangPath="${MainClangPath}"-gengkapak
+      export PATH="${ClangPath}/bin:${PATH}"
+      fi
   else
     echo "[!] Incorrect clang name. Check config.env for clang names."
     exit 1
