@@ -42,7 +42,6 @@
 
 
 static struct kmem_cache *kmem_attach_pool;
-
 void __init init_dma_buf_kmem_pool(void)
 {
 	kmem_attach_pool = KMEM_CACHE(dma_buf_attachment, SLAB_HWCACHE_ALIGN | SLAB_PANIC);
@@ -706,16 +705,8 @@ struct dma_buf_attachment *dma_buf_attach(struct dma_buf *dmabuf,
 
 	attach = kzalloc(sizeof(*attach), GFP_KERNEL);
 	if (!attach)
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-
-=======
-	
->>>>>>> parent of eba816c3aae1 (dma_buf: try to use kmem_cache pool for dmabuf allocations)
 	attach = kmem_cache_zalloc(kmem_attach_pool, GFP_KERNEL);
 	if (attach == NULL)
->>>>>>> eba816c3aae1 (dma_buf: try to use kmem_cache pool for dmabuf allocations)
 		return ERR_PTR(-ENOMEM);
 
 	attach->dev = dev;
