@@ -106,6 +106,7 @@ static void dma_buf_release(struct dentry *dentry)
 		kmem_cache_free(kmem_dma_buf_pool, dmabuf);
 	else
 		kfree(dmabuf);
+	return 0;
 }
 
 static int dma_buf_file_release(struct inode *inode, struct file *file)
