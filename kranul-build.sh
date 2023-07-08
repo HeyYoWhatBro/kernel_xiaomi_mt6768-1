@@ -341,7 +341,7 @@ make -j"$CORES" ARCH=$ARCH O=out \
       git clone --depth 1 --no-single-branch https://github.com/HeyYoWhatBro/AnyKernel3 -b merlin ${AnyKernelPath}
       cp $IMAGE ${AnyKernelPath}
    else
-      tgm "<i> ❌ Compile Kernel for $DEVICE_CODENAME failed, Check console log to fix it!</i>"
+      tgf "${MainPath}/error.log" "<i> ❌ Compile Kernel for $DEVICE_CODENAME failed, Check console log to fix it!</i>"
       if [ "$CLEANUP" = "yes" ];then
         cleanup
       fi
