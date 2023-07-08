@@ -15,8 +15,6 @@
 #include <linux/init.h>
 #include <asm/atomic.h>
 #include <linux/timer.h>
-#include <linux/cpu_input_boost.h>
-#include <linux/devfreq_boost.h>
 #include "cpu_ctrl.h"
 
 #include "teei_fp.h"
@@ -897,9 +895,6 @@ static long gf_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		break;
 
 	case GF_IOC_INPUT_KEY_EVENT:
-	    cpu_input_boost_kick_max(50);
-		devfreq_boost_kick_max(DEVFREQ_MSM_CPUBW, 50);
-		devfreq_boost_kick_max(DEVFREQ_MSM_LLCCBW, 50);
 		if (copy_from_user(&gf_key, (struct gf_key *)arg, sizeof(struct gf_key))) {
 			gf_debug(ERR_LOG, "Failed to copy input key event from user to kernel\n");
 			retval = -EFAULT;
