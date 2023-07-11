@@ -2353,10 +2353,6 @@ const struct cpumask *const cpu_perf_mask = cpu_possible_mask;
 #endif
 EXPORT_SYMBOL(cpu_perf_mask);
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 2240bdc29f54 ([SQUASH] drivers/devfreq: Implementation of devfreq_boost)
 void init_cpu_present(const struct cpumask *src)
 {
 	cpumask_copy(&__cpu_present_mask, src);
