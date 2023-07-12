@@ -290,6 +290,7 @@ function ksusendinfo(){
 <b> Ksu Version</b>    : <code>${KERNELSU_VERSION}</code>
 <b> Compiler Name</b>  : <code>${KBUILD_COMPILER_STRING}</code>
 <b>------------------------------------------</b>
+"
 }
 
 function sendinfo(){
