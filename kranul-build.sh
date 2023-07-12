@@ -280,35 +280,30 @@ function ksuannounce() {
 # Send info build to telegram channel
 function ksusendinfo(){
   tgm "
-  ⚙ <i>Compilation has been started</i>
-  <b>===========================================</b>
-  <b>• DATE :</b> <code>$(TZ=Asia/Jakarta date +"%A, %d %b %Y, %H:%M:%S")</code>
-  <b>• DEVICE :</b> <code>${DEVICE_MODEL} ($DEVICE_CODENAME)</code>
-  <b>• KERNEL NAME :</b> <code>${KERNEL_NAME}</code>
-  <b>• KERNEL LINUX VERSION :</b> <code>${SUBLEVEL}</code>
-  <b>• BRANCH NAME :</b> <code>${BRANCH}</code>
-  <b>• COMPILER :</b> <code>${KBUILD_COMPILER_STRING}</code>
-  <b>• KERNEL VARIANT :</b> <code>${KERNEL_VARIANT}</code>
-  <b>• KERNELSU :</b> <code>${KERNELSU}</code>
-  <b>• KERNELSU VERSION :</b> <code>${KERNELSU_VERSION}</code>
-  <b>===========================================</b>
-  "
+<b> Pabji ${KERNEL_VERSION} KSU Kernel Build Triggered</b>
+<b>-----------------------------------------</b>
+<b> Architecture</b>   : <code>$ARCH</code>
+<b> Build Date</b>     : <code>$DATE</code>
+<b> Device Name</b>    : <code>${DEVICE_MODEL} [${DEVICE_CODENAME}]</code>
+<b> Kernel Name</b>    : <code>${KERNEL_NAME}-${KERNEL_VARIANT}</code>
+<b> Linux Version</b>  : <code>$(make kernelversion)</code>
+<b> Ksu Version</b>    : <code>${KERNELSU_VERSION}</code>
+<b> Compiler Name</b>  : <code>${KBUILD_COMPILER_STRING}</code>
+<b>------------------------------------------</b>
 }
 
 function sendinfo(){
   tgm "
-  ⚙ <i>Compilation has been started</i>
-  <b>===========================================</b>
-  <b>• DATE :</b> <code>$(TZ=Asia/Jakarta date +"%A, %d %b %Y, %H:%M:%S")</code>
-  <b>• DEVICE :</b> <code>${DEVICE_MODEL} ($DEVICE_CODENAME)</code>
-  <b>• KERNEL NAME :</b> <code>${KERNEL_NAME}</code>
-  <b>• KERNEL LINUX VERSION :</b> <code>${SUBLEVEL}</code>
-  <b>• BRANCH NAME :</b> <code>${BRANCH}</code>
-  <b>• COMPILER :</b> <code>${KBUILD_COMPILER_STRING}</code>
-  <b>• KERNEL VARIANT :</b> <code>${KERNEL_VARIANT}</code>
-  <b>• KERNELSU :</b> <code>${KERNELSU}</code>
-  <b>===========================================</b>
-  "
+<b> Pabji ${KERNEL_VERSION} Kernel Build Triggered</b>
+<b>-----------------------------------------</b>
+<b> Architecture</b>   : <code>$ARCH</code>
+<b> Build Date</b>     : <code>$DATE</code>
+<b> Device Name</b>    : <code>${DEVICE_MODEL} [${DEVICE_CODENAME}]</code>
+<b> Kernel Name</b>    : <code>${KERNEL_NAME}-${KERNEL_VARIANT}</code>
+<b> Linux Version</b>  : <code>$(make kernelversion)</code>
+<b> Compiler Name</b>  : <code>${KBUILD_COMPILER_STRING}</code>
+<b>------------------------------------------</b>
+" 
 }
 
 # Start Compile
@@ -316,10 +311,11 @@ START=$(date +"%s")
 
 compile(){
 if [ "$ClangName" = "proton" ]; then
-  sed -i 's/CONFIG_LLVM_POLLY=y/# CONFIG_LLVM_POLLY is not set/g' ${MainPath}/arch/$ARCH/configs/xiaomi/merlin.config || echo ""
+  sed -i 's/CONFIG_LLVM_POLLY=y/# CONFIG_LLVM_POLLY is not set/g' ${MainPath}/arch/$ARCH/configs/xiaomi_defconfig || echo ""
 else
-  sed -i 's/# CONFIG_LLVM_POLLY is not set/CONFIG_LLVM_POLLY=y/g' ${MainPath}/arch/$ARCH/configs/xiaomi/merlin.config || echo ""
+  sed -i 's/# CONFIG_LLVM_POLLY is not set/CONFIG_LLVM_POLLY=y/g' ${MainPath}/arch/$ARCH/configs/xiaomi_defconfig || echo ""
 fi
+
 make O=out ARCH=$ARCH xiaomi_defconfig "xiaomi/merlin.config"
 make -j"$CORES" ARCH=$ARCH O=out \
     CC=clang \
