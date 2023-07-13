@@ -25,6 +25,22 @@
 #include <linux/vmpressure.h>
 
 /*
+ * The window size (vmpressure_win) is the number of scanned pages before
+ * we try to analyze scanned/reclaimed ratio. So the window is used as a
+ * rate-limit tunable for the "low" level notification, and also for
+ * averaging the ratio for medium/critical levels. Using small window
+ * sizes can cause lot of false positives, but too big window size will
+ * delay the notifications.
+ *
+ * As the vmscan reclaimer logic works with chunks which are multiple of
+ * SWAP_CLUSTER_MAX, it makes sense to use it for the window size as well.
+ *
+ * TODO: Make the window size depend on machine size, as we do for vmstat
+ * thresholds. Currently we set it to 512 pages (2MB for 4KB pages).
+ */
+static unsigned long vmpressure_win = SWAP_CLUSTER_MAX * 16;
+
+/*
  * These thresholds are used when we account memory pressure through
  * scanned/reclaimed ratio. The current values were chosen empirically. In
  * essence, they are percents: the higher the value, the more number
@@ -305,12 +321,6 @@ void vmpressure(gfp_t gfp, struct mem_cgroup *memcg, bool tree,
 			memcg->socket_pressure = jiffies + HZ;
 		}
 	}
-
-	if (order > PAGE_ALLOC_COSTLY_ORDER)
-		return;
-
-	__vmpressure(gfp, memcg, false, tree, scanned, reclaimed);
-
 }
 
 /**
@@ -343,7 +353,7 @@ void vmpressure_prio(gfp_t gfp, struct mem_cgroup *memcg, int prio, int order)
 	 * to the vmpressure() basically means that we signal 'critical'
 	 * level.
 	 */
-	__vmpressure(gfp, memcg, true, true, 0, 0);
+	vmpressure(gfp, memcg, true, vmpressure_win, 0);
 }
 
 static enum vmpressure_levels str_to_level(const char *arg)
