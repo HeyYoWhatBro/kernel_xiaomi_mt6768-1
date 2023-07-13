@@ -226,7 +226,6 @@ static void vmpressure_work_fn(struct work_struct *work)
 	} while ((vmpr = vmpressure_parent(vmpr)));
 }
 
-
 static unsigned long calculate_vmpressure_win(void)
 {
 	long x;
