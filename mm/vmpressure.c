@@ -352,7 +352,7 @@ void vmpressure_prio(gfp_t gfp, struct mem_cgroup *memcg, int prio, int order)
 	 * to the vmpressure() basically means that we signal 'critical'
 	 * level.
 	 */
-	vmpressure(gfp, memcg, true, 0);
+	vmpressure(gfp, memcg, true);
 }
 
 static enum vmpressure_levels str_to_level(const char *arg)
