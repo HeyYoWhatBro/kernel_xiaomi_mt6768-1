@@ -38,7 +38,6 @@
  * TODO: Make the window size depend on machine size, as we do for vmstat
  * thresholds. Currently we set it to 512 pages (2MB for 4KB pages).
  */
-static unsigned long vmpressure_win = SWAP_CLUSTER_MAX * 16;
 
 /*
  * These thresholds are used when we account memory pressure through
@@ -353,7 +352,7 @@ void vmpressure_prio(gfp_t gfp, struct mem_cgroup *memcg, int prio, int order)
 	 * to the vmpressure() basically means that we signal 'critical'
 	 * level.
 	 */
-	vmpressure(gfp, memcg, true, vmpressure_win, 0);
+	vmpressure(gfp, memcg, true, 0);
 }
 
 static enum vmpressure_levels str_to_level(const char *arg)
