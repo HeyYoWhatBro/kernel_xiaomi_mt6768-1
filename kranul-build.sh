@@ -373,10 +373,10 @@ function kernelsu() {
       if [ ! -f "${MainPath}/KernelSU/README.md" ]; then
         cd ${MainPath}
         curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
-        echo "CONFIG_KPROBES=y" >> arch/${ARCH}/configs/xiaomi.defconfig
-        echo "CONFIG_HAVE_KPROBES=y" >> arch/${ARCH}/configs/xiaomi.defconfig
-        echo "CONFIG_KPROBE_EVENTS=y" >> arch/${ARCH}/configs/xiaomi.defconfig
-        echo "CONFIG_OVERLAY_FS=y" >> arch/${ARCH}/configs/xiaomi.defconfig
+        echo "CONFIG_KPROBES=y" >> arch/${ARCH}/configs/xiaomi_defconfig
+        echo "CONFIG_HAVE_KPROBES=y" >> arch/${ARCH}/configs/xiaomi_defconfig
+        echo "CONFIG_KPROBE_EVENTS=y" >> arch/${ARCH}/configs/xiaomi_defconfig
+        echo "CONFIG_OVERLAY_FS=y" >> arch/${ARCH}/configs/xiaomi_defconfig
       fi
       sudo rm -rf KernelSU && git clone https://github.com/tiann/KernelSU
       ksusendinfo
