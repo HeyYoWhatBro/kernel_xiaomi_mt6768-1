@@ -172,7 +172,8 @@ export ARCH="arm64"
 export KBUILD_BUILD_USER="nuuwy0"
 export KBUILD_BUILD_HOST="hp-gw"
 #export KERNEL_NAME="$(cat "arch/arm64/configs/$DEVICE_DEFCONFIG" | grep "CONFIG_LOCALVERSION=" | sed 's/CONFIG_LOCALVERSION="-*//g' | sed 's/"*//g' )"
-export KERNEL_NAME="Pabji-R1"
+export KERNEL_NAME="Helios"
+export KERNEL_VERSION="R1"
 export SUBLEVEL="v4.14.$(cat "${MainPath}/Makefile" | grep "SUBLEVEL =" | sed 's/SUBLEVEL = *//g')"
 IMAGE="${MainPath}/out/arch/arm64/boot/Image.gz-dtb"
 CORES="$(nproc --all)"
@@ -280,7 +281,7 @@ function ksuannounce() {
 # Send info build to telegram channel
 function ksusendinfo(){
   tgm "
-<b> Pabji ${KERNEL_VERSION} KSU Kernel Build Triggered</b>
+<b> Helios ${KERNEL_VERSION} KSU Kernel Build Triggered</b>
 <b>-----------------------------------------</b>
 <b> Architecture</b>   : <code>$ARCH</code>
 <b> Build Date</b>     : <code>$DATE</code>
@@ -295,7 +296,7 @@ function ksusendinfo(){
 
 function sendinfo(){
   tgm "
-<b> Pabji ${KERNEL_VERSION} Kernel Build Triggered</b>
+<b> Helios ${KERNEL_VERSION} Kernel Build Triggered</b>
 <b>-----------------------------------------</b>
 <b> Architecture</b>   : <code>$ARCH</code>
 <b> Build Date</b>     : <code>$DATE</code>
@@ -372,10 +373,10 @@ function kernelsu() {
       if [ ! -f "${MainPath}/KernelSU/README.md" ]; then
         cd ${MainPath}
         curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
-        echo "CONFIG_KPROBES=y" >> arch/${ARCH}/configs/xiaomi/merlin.config
-        echo "CONFIG_HAVE_KPROBES=y" >> arch/${ARCH}/configs/xiaomi/merlin.config
-        echo "CONFIG_KPROBE_EVENTS=y" >> arch/${ARCH}/configs/xiaomi/merlin.config
-        echo "CONFIG_OVERLAY_FS=y" >> arch/${ARCH}/configs/xiaomi/merlin.config
+        echo "CONFIG_KPROBES=y" >> arch/${ARCH}/configs/xiaomi.defconfig
+        echo "CONFIG_HAVE_KPROBES=y" >> arch/${ARCH}/configs/xiaomi.defconfig
+        echo "CONFIG_KPROBE_EVENTS=y" >> arch/${ARCH}/configs/xiaomi.defconfig
+        echo "CONFIG_OVERLAY_FS=y" >> arch/${ARCH}/configs/xiaomi.defconfig
       fi
       sudo rm -rf KernelSU && git clone https://github.com/tiann/KernelSU
       ksusendinfo
