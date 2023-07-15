@@ -4471,15 +4471,6 @@ void scheduler_tick(void)
 #ifdef CONFIG_MTK_QOS_FRAMEWORK
 	qos_prefetch_tick(cpu);
 #endif /* CONFIG_MTK_QOS_FRAMEWORK */
-	if (idle_cpu(cpu) && is_reserved(cpu))
-		clear_reserved(cpu);
-
-#ifdef CONFIG_SMP
-	rq_lock(rq, &rf);
-	if (idle_cpu(cpu) && is_reserved(cpu) && !rq->active_balance)
-		clear_reserved(cpu);
-	rq_unlock(rq, &rf);
-#endif
 }
 
 #ifdef CONFIG_NO_HZ_FULL
