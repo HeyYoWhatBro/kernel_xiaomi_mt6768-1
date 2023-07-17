@@ -170,7 +170,7 @@ DEVICE_CODENAME="merlin"
 #export DEFCONFIG="merlin.config"
 export ARCH="arm64"
 export KBUILD_BUILD_USER="nuuwy0"
-export KBUILD_BUILD_HOST="hp-gw"
+export KBUILD_BUILD_HOST="0ywuun"
 #export KERNEL_NAME="$(cat "arch/arm64/configs/$DEVICE_DEFCONFIG" | grep "CONFIG_LOCALVERSION=" | sed 's/CONFIG_LOCALVERSION="-*//g' | sed 's/"*//g' )"
 export KERNEL_NAME="Helios"
 export KERNEL_VERSION="R1"
@@ -281,12 +281,12 @@ function ksuannounce() {
 # Send info build to telegram channel
 function ksusendinfo(){
   tgm "
-<b> Helios ${KERNEL_VERSION} KSU Kernel Build Triggered</b>
+<b> Helios ${KERNEL_VERSION} Kernel Build Triggered</b>
 <b>-----------------------------------------</b>
 <b> Architecture</b>   : <code>$ARCH</code>
 <b> Build Date</b>     : <code>$DATE</code>
 <b> Device Name</b>    : <code>${DEVICE_MODEL} [${DEVICE_CODENAME}]</code>
-<b> Kernel Name</b>    : <code>${KERNEL_NAME}-${KERNEL_VARIANT}</code>
+<b> Kernel Name</b>    : <code>${KERNEL_NAME}</code>
 <b> Linux Version</b>  : <code>$(make kernelversion)</code>
 <b> Ksu Version</b>    : <code>${KERNELSU_VERSION}</code>
 <b> Compiler Name</b>  : <code>${KBUILD_COMPILER_STRING}</code>
@@ -301,7 +301,7 @@ function sendinfo(){
 <b> Architecture</b>   : <code>$ARCH</code>
 <b> Build Date</b>     : <code>$DATE</code>
 <b> Device Name</b>    : <code>${DEVICE_MODEL} [${DEVICE_CODENAME}]</code>
-<b> Kernel Name</b>    : <code>${KERNEL_NAME}-${KERNEL_VARIANT}</code>
+<b> Kernel Name</b>    : <code>${KERNEL_NAME}</code>
 <b> Linux Version</b>  : <code>$(make kernelversion)</code>
 <b> Compiler Name</b>  : <code>${KBUILD_COMPILER_STRING}</code>
 <b>------------------------------------------</b>
@@ -368,7 +368,7 @@ function cleanup() {
 # KernelSU function
 function kernelsu() {
     if [ "$KERNELSU" = "yes" ];then
-      KERNEL_VARIANT="${KERNEL_VARIANT}-KernelSU"
+      KERNEL_VARIANT="${KERNEL_VARIANT}-KSU"
       KERNELSU_VERSION="$((10000 + $(cd KernelSU && git rev-list --count HEAD) + 200))"
       if [ ! -f "${MainPath}/KernelSU/README.md" ]; then
         cd ${MainPath}
